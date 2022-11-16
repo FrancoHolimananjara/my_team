@@ -37,7 +37,7 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-const sync = async(sequelise)=>{
+const sync = async()=>{
   const connection = await mysql.createConnection({
     user:config.username,
     password:config.password
@@ -45,7 +45,7 @@ const sync = async(sequelise)=>{
 
   connection.query(`CREATE DATABASE IF NOT EXISTS ${config.database};`)
 
-  sequelize.sync()
+  sequelize.sync({alter:true})
     .then(() => {
       console.log("Base de donnée synchronisée");
     }).catch((err) => {
@@ -53,6 +53,6 @@ const sync = async(sequelise)=>{
     });
 }
 
-db.syncDataBase = sync(db.sequelize);
+db.syncDataBase = sync();
 
 module.exports = db;
