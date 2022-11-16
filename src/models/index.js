@@ -9,6 +9,8 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
+const mysql = require('mysql2/promise');
+
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -34,5 +36,23 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+const sync = async(sequelise)=>{
+  const connection = await mysql.createConnection({
+    user:config.username,
+    password:config.password
+  });
+
+  connection.query(`CREATE DATABASE IF NOT EXISTS ${config.database};`)
+
+  sequelize.sync()
+    .then(() => {
+      console.log("Base de donnée synchronisée");
+    }).catch((err) => {
+      console.log(err);
+    });
+}
+
+db.syncDataBase = sync(db.sequelize);
 
 module.exports = db;
